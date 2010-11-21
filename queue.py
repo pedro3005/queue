@@ -13,6 +13,11 @@ class Queue:
             self.put(arg)
     def put(self, element):
         self.queue.insert(0, element)
+    def remove(self, element):
+        try:
+            self.queue.remove(element)
+        except ValueError:
+            raise QueueError("Could not find element {0}!".format(element))
     def next(self):
         try:
             return self.queue.pop()
@@ -48,9 +53,12 @@ Everything's fine, though you did lose anything you might have stored.'''
     
     if argc == 0:
         print '''Welcome to queue.py! Commands:
-    ./queue.py add item1 [item2, item3, ...]
-    ./queue.py next
-    ./queue.py reset'''
+    add item1 [item2, item3, ...] -- adds the items to the queue
+    next -- grabs an item from the queue and puts it as pending
+    reset -- moves all pending items back to the queue
+    done [item1, item2, ...] -- without arguments, removes the first pending item.
+    print -- prints your queues (main and pending)
+    clear -- clears the main queue'''
         
     elif sys.argv[0] == "add":
         if argc == 1:
@@ -63,9 +71,9 @@ The right way is:
     
     elif sys.argv[0] == "next":
         try:
-            next = main.next()
-            pending.put(next)
-            print "Next is {0}. it has been added to the pending queue.".format(next)
+            next_key = main.next()
+            pending.put(next_key)
+            print "Next is {0}. it has been added to the pending queue.".format(next_key)
         except QueueError:
             print "Queue is empty! Try adding something"
     
@@ -74,6 +82,25 @@ The right way is:
             print "There is nothing on the pending queue."
         else:
             main = Queue(*(queue_to_list(pending) + queue_to_list(main)))
+    
+    elif sys.argv[0] == "done":
+        if argc == 1:
+            pending.next() # it gets thrown away, so essentially removing
+        else:
+            for item in sys.argv[1:]:
+                try:
+                    pending.remove(item)
+                except QueueError:
+                    print "Could not find {0}".format(item)
+    
+    elif sys.argv[0] == "print":
+        print '''Here is your main queue:
+{0}
+And here are your pending items:
+{1}'''.format(main, pending)
+
+    elif sys.argv[0] == "clear":
+        main = Queue()
     
     cPickle.dump([main, pending], outfd)
     outfd.close()
