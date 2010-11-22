@@ -1,7 +1,10 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 import sys
 import cPickle
+import subprocess
+import os.path
+import time
 
 class QueueError(Exception):
     pass
@@ -31,6 +34,11 @@ class Queue(object):
         return len(self.queue)
 
 if __name__ == "__main__":
+    
+    while os.path.isfile(".queue-lock"):
+        pass
+    
+    subprocess.call(["touch", ".queue-lock"])
     
     try:
         main, pending = cPickle.load(open(".queue_data"))
@@ -83,6 +91,12 @@ if __name__ == "__main__":
     elif sys.argv[0] == "clear":
         main = Queue()
     
+    elif sys.argv[0] == "wait":
+        time.sleep(30)
+        print "Waited 30 secs"
+    
     outfd = open(".queue_data", "w")
     cPickle.dump([main, pending], outfd)
     outfd.close()
+
+    subprocess.call(["rm", ".queue-lock"])
