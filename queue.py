@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 
 import sys
 import cPickle
@@ -73,7 +73,7 @@ The right way is:
         try:
             next_key = main.next()
             pending.put(next_key)
-            print "Next is {0}. it has been added to the pending queue.".format(next_key)
+            print "{0}".format(next_key)
         except QueueError:
             print "Queue is empty! Try adding something"
     
