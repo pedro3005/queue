@@ -4,7 +4,6 @@ import sys
 import cPickle
 import subprocess
 import os.path
-import time
 
 class QueueError(Exception):
     pass
@@ -90,10 +89,6 @@ if __name__ == "__main__":
 
     elif sys.argv[0] == "clear":
         main = Queue()
-    
-    elif sys.argv[0] == "wait":
-        time.sleep(30)
-        print "Waited 30 secs"
     
     outfd = open(".queue_data", "w")
     cPickle.dump([main, pending], outfd)
