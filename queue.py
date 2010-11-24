@@ -32,6 +32,11 @@ class Queue(object):
     def __len__(self):
         return len(self.queue)
 
+def exit(status):
+    if os.path.isfile(".queue-lock"):
+        subprocess.call(["rm", ".queue-lock"])
+    sys.exit(status)
+
 if __name__ == "__main__":
     
     while os.path.isfile(".queue-lock"):
@@ -50,11 +55,11 @@ if __name__ == "__main__":
     argc = len(sys.argv)
     
     if argc == 0:
-       sys.exit(1)
+       exit(1)
         
     elif sys.argv[0] == "add":
         if argc == 1:
-            sys.exit(1)
+            exit(1)
         else:
             for item in sys.argv[1:]:
                 main.put(item)
@@ -65,11 +70,11 @@ if __name__ == "__main__":
             pending.put(next_key)
             print "{0}".format(next_key)
         except QueueError:
-            sys.exit(1)
+            exit(1)
     
     elif sys.argv[0] == "reset":
         if len(pending) < 1:
-            sys.exit(1)
+            exit(1)
         else:
             main = Queue(*(pending.to_list() + main.to_list()))
     
@@ -94,4 +99,5 @@ if __name__ == "__main__":
     cPickle.dump([main, pending], outfd)
     outfd.close()
 
-    subprocess.call(["rm", ".queue-lock"])
+    exit(0)
+
